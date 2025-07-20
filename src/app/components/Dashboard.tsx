@@ -38,9 +38,9 @@ export default function Dashboard() {
     }
 
     const ethProvider = _providers["ethereum"] || getProvider("ethereum");
-    if ((ethProvider as any)._websocket) {
-      (ethProvider as any)._websocket.on('error', (err: unknown) => console.error('ETH WebSocket error:', err));
-      (ethProvider as any)._websocket.on('close', () => console.error('ETH WebSocket closed'));
+    if ((ethProvider as { _websocket?: { on: (event: string, cb: unknown) => void } })._websocket) {
+      (ethProvider as { _websocket: { on: (event: string, cb: unknown) => void } })._websocket.on('error', (err: unknown) => console.error('ETH WebSocket error:', err));
+      (ethProvider as { _websocket: { on: (event: string, cb: unknown) => void } })._websocket.on('close', () => console.error('ETH WebSocket closed'));
     }
     setProviders(_providers);
     return () => {

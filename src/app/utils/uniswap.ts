@@ -18,8 +18,8 @@ function calculatePriceFromSqrtPriceX96(sqrtPriceX96: bigint): number {
 
 export async function fetchUniswapPrice(provider: unknown): Promise<number> {
   try {
-    const latestBlock = await (provider as any).getBlockNumber();
-    const logs = await (provider as any).getLogs({
+    const latestBlock = await (provider as { getBlockNumber: () => Promise<number> }).getBlockNumber();
+    const logs = await (provider as { getLogs: (args: unknown) => Promise<any[]> }).getLogs({
       address: UNISWAP_V3_POOL,
       topics: [SWAP_TOPIC],
       fromBlock: latestBlock - 100,
