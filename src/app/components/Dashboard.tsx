@@ -6,17 +6,17 @@ import { getETHPrice } from '../utils/uniswap';
 import GasChart from "./GasChart";
 
 export default function Dashboard() {
-  const { mode, chains, usdPrice, setMode, setUsdPrice, updateChain, addGasPoint } = useStore();
+  const { mode, chains, usdPrice, setMode, updateChain, addGasPoint } = useStore();
   const [txValue, setTxValue] = useState(0.1);
-  const [providers, setProviders] = useState<{ [key: string]: any }>({});
-  const providersRef = useRef<{ [key: string]: any }>({});
+  const [providers, setProviders] = useState<Record<string, unknown>>({});
+  const providersRef = useRef<Record<string, unknown>>({});
 
   useEffect(() => {
     providersRef.current = providers;
   }, [providers]);
 
   useEffect(() => {
-    const _providers: { [key: string]: any } = {};
+    const _providers: Record<string, unknown> = {};
     
     if (mode === "live") {
       _providers["ethereum"] = subscribeGas("ethereum", (gas) => {
@@ -38,13 +38,13 @@ export default function Dashboard() {
     }
 
     const ethProvider = _providers["ethereum"] || getProvider("ethereum");
-    if (ethProvider._websocket) {
-      ethProvider._websocket.on('error', (err: any) => console.error('ETH WebSocket error:', err));
-      ethProvider._websocket.on('close', () => console.error('ETH WebSocket closed'));
+    if ((ethProvider as any)._websocket) {
+      (ethProvider as any)._websocket.on('error', (err: unknown) => console.error('ETH WebSocket error:', err));
+      (ethProvider as any)._websocket.on('close', () => console.error('ETH WebSocket closed'));
     }
     setProviders(_providers);
     return () => {
-      Object.values(_providers).forEach((p: any) => p?.destroy?.());
+      Object.values(_providers).forEach((p) => (p as any)?.destroy?.());
     };
   }, [mode, updateChain, addGasPoint]);
 
