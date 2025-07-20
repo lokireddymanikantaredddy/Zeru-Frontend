@@ -19,7 +19,7 @@ function calculatePriceFromSqrtPriceX96(sqrtPriceX96: bigint): number {
 export async function fetchUniswapPrice(provider: unknown): Promise<number> {
   try {
     const latestBlock = await (provider as { getBlockNumber: () => Promise<number> }).getBlockNumber();
-    const logs = await (provider as { getLogs: (args: unknown) => Promise<any[]> }).getLogs({
+    const logs = await (provider as { getLogs: (args: unknown) => Promise<unknown[]> }).getLogs({
       address: UNISWAP_V3_POOL,
       topics: [SWAP_TOPIC],
       fromBlock: latestBlock - 100,
@@ -32,7 +32,7 @@ export async function fetchUniswapPrice(provider: unknown): Promise<number> {
     const iface = new Interface([
       'event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)'
     ]);
-    const parsedLog = iface.parseLog(latestLog);
+    const parsedLog = iface.parseLog(latestLog as any);
     if (!parsedLog) {
       throw new Error('Failed to parse Swap event log');
     }
