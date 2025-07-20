@@ -1,4 +1,4 @@
-import { ethers, Interface } from 'ethers';
+import { Interface } from 'ethers';
 
 export const UNISWAP_V3_POOL = '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640';
 export const SWAP_TOPIC = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67';
@@ -16,10 +16,10 @@ function calculatePriceFromSqrtPriceX96(sqrtPriceX96: bigint): number {
   return price;
 }
 
-export async function fetchUniswapPrice(provider: any): Promise<number> {
+export async function fetchUniswapPrice(provider: unknown): Promise<number> {
   try {
-    const latestBlock = await provider.getBlockNumber();
-    const logs = await provider.getLogs({
+    const latestBlock = await (provider as any).getBlockNumber();
+    const logs = await (provider as any).getLogs({
       address: UNISWAP_V3_POOL,
       topics: [SWAP_TOPIC],
       fromBlock: latestBlock - 100,
@@ -92,7 +92,7 @@ export function getFallbackPrice(): number {
   return 3500;
 }
 
-export async function getETHPrice(provider?: any): Promise<number> {
+export async function getETHPrice(provider?: unknown): Promise<number> {
   if (provider) {
     try {
       const uniswapPrice = await fetchUniswapPrice(provider);

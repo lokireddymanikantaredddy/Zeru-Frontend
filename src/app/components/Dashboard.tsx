@@ -44,7 +44,7 @@ export default function Dashboard() {
     }
     setProviders(_providers);
     return () => {
-      Object.values(_providers).forEach((p) => (p as any)?.destroy?.());
+      Object.values(_providers).forEach((p: unknown) => (p as { destroy?: () => void })?.destroy?.());
     };
   }, [mode, updateChain, addGasPoint]);
 

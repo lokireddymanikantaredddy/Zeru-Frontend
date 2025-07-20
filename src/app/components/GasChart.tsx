@@ -16,15 +16,6 @@ export default function GasChart() {
   const [currentTime, setCurrentTime] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const updateTime = () => {
-      setCurrentTime(new Date().toLocaleTimeString());
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   const getCandlestickData = (): GasCandle[] => {
     const candles: { [key: number]: GasCandle } = {};
     const fifteenMinutes = 15 * 60 * 1000;
@@ -51,6 +42,15 @@ export default function GasChart() {
     });
     return Object.values(candles).sort((a, b) => a.time - b.time);
   };
+
+  useEffect(() => {
+    const updateTime = () => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
