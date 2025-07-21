@@ -1,4 +1,4 @@
-import { Interface } from 'ethers';
+import { Interface, Log } from 'ethers';
 
 export const UNISWAP_V3_POOL = '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640';
 export const SWAP_TOPIC = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67';
@@ -32,7 +32,7 @@ export async function fetchUniswapPrice(provider: unknown): Promise<number> {
     const iface = new Interface([
       'event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)'
     ]);
-    const parsedLog = iface.parseLog(latestLog as any);
+    const parsedLog = iface.parseLog(latestLog as Log);
     if (!parsedLog) {
       throw new Error('Failed to parse Swap event log');
     }
