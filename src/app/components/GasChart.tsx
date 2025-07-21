@@ -105,6 +105,7 @@ export default function GasChart() {
     const candleWidth = Math.max(1, Math.min(20, chartWidth / candlestickData.length - 2));
     const candleSpacing = chartWidth / candlestickData.length;
 
+    // Draw grid
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 5; i++) {
@@ -121,6 +122,42 @@ export default function GasChart() {
       ctx.lineTo(x, padding + chartHeight);
       ctx.stroke();
     }
+
+    // Y axis price labels (larger font)
+    ctx.fillStyle = '#a0aec0';
+    ctx.font = '14px Inter';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+      const price = maxPrice - (priceRange / 5) * i;
+      const y = padding + (chartHeight / 5) * i + 4;
+      ctx.fillText(`${price.toFixed(2)} Gwei`, padding - 12, y);
+    }
+    // Y axis title
+    ctx.save();
+    ctx.translate(padding - 35, padding + chartHeight / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 15px Inter';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText('Gas Price (Gwei)', 0, 0);
+    ctx.restore();
+
+    // X axis time labels (larger font)
+    ctx.textAlign = 'center';
+    ctx.font = '14px Inter';
+    const timeStep = Math.max(1, Math.floor(candlestickData.length / 5));
+    for (let i = 0; i < candlestickData.length; i += timeStep) {
+      const x = padding + i * candleSpacing + candleSpacing / 2;
+      const time = new Date(candlestickData[i].time);
+      const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      ctx.fillText(timeStr, x, rect.height - 10);
+    }
+    // X axis title
+    ctx.font = 'bold 15px Inter';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText('Time', padding + chartWidth / 2, rect.height - 2);
+
+    // Draw candlesticks
     candlestickData.forEach((candle, index) => {
       const x = padding + index * candleSpacing + candleSpacing / 2 - candleWidth / 2;
       const openY = padding + chartHeight - ((candle.open - minPrice) / priceRange) * chartHeight;
