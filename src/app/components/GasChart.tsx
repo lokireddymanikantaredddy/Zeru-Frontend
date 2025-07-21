@@ -82,6 +82,66 @@ export default function GasChart() {
 
   const candlestickData = getCandlestickData();
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    if (candlestickData.length === 0) return;
+
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    const padding = 40;
+    const chartWidth = rect.width - padding * 2;
+    const chartHeight = rect.height - padding * 2;
+    const prices = candlestickData.flatMap(candle => [candle.high, candle.low]);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const priceRange = maxPrice - minPrice || 1;
+    const candleWidth = Math.max(1, Math.min(20, chartWidth / candlestickData.length - 2));
+    const candleSpacing = chartWidth / candlestickData.length;
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = padding + (chartHeight / 5) * i;
+      ctx.beginPath();
+      ctx.moveTo(padding, y);
+      ctx.lineTo(padding + chartWidth, y);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= 10; i++) {
+      const x = padding + (chartWidth / 10) * i;
+      ctx.beginPath();
+      ctx.moveTo(x, padding);
+      ctx.lineTo(x, padding + chartHeight);
+      ctx.stroke();
+    }
+    candlestickData.forEach((candle, index) => {
+      const x = padding + index * candleSpacing + candleSpacing / 2 - candleWidth / 2;
+      const openY = padding + chartHeight - ((candle.open - minPrice) / priceRange) * chartHeight;
+      const closeY = padding + chartHeight - ((candle.close - minPrice) / priceRange) * chartHeight;
+      const highY = padding + chartHeight - ((candle.high - minPrice) / priceRange) * chartHeight;
+      const lowY = padding + chartHeight - ((candle.low - minPrice) / priceRange) * chartHeight;
+      const isGreen = candle.close >= candle.open;
+      ctx.fillStyle = isGreen ? '#26a69a' : '#ef5350';
+      ctx.strokeStyle = isGreen ? '#26a69a' : '#ef5350';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + candleWidth / 2, highY);
+      ctx.lineTo(x + candleWidth / 2, lowY);
+      ctx.stroke();
+      const bodyHeight = Math.max(1, Math.abs(closeY - openY));
+      const bodyY = Math.min(openY, closeY);
+      ctx.fillRect(x, bodyY, candleWidth, bodyHeight);
+      ctx.strokeRect(x, bodyY, candleWidth, bodyHeight);
+    });
+  }, [candlestickData]);
+
   return (
     <div className="gas-chart">
       <div className="chart-container">
@@ -91,6 +151,8 @@ export default function GasChart() {
             <canvas 
               ref={canvasRef} 
               className="candlestick-canvas"
+              width={800}
+              height={320}
               style={{ width: '100%', height: '320px' }}
             />
           </div>
